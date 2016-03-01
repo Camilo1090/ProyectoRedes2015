@@ -1,0 +1,44 @@
+import os
+from flask import Flask, request, render_template
+import monitor
+import transmission
+
+app = Flask(__name__)
+app.config['PROPAGATE_EXCEPTIONS'] = True
+
+@app.route("/")
+def welcome():
+ return render_template('index.html')
+
+@app.route("/monitor/insert")
+def monitor_insert():
+ return monitor.insert_state(request.args.get('year'), request.args.get('month'), request.args.get('day'), request.args.get('hour'), request.args.get('minute'), request.args.get('second'), request.args.get('who'), request.args.get('cpu_us'), request.args.get('cpu_sy'), request.args.get('cpu_id'), request.args.get('cpu_wa'), request.args.get('cpu_st'), request.args.get('mem_swpd'), request.args.get('mem_free'), request.args.get('mem_buff'), request.args.get('mem_cache'), request.args.get('swap_si'), request.args.get('swap_so'))
+
+@app.route("/monitor/consult")
+def monitor_consult():
+ return monitor.consult_states()
+
+@app.route("/transmission/insert")
+def transmission_insert():
+ return render_template('transmission_insert.html')
+
+@app.route("/transmission/magnet", methods=['POST'])
+def transmission_magnet():
+ if request.method == 'POST':
+  return transmission.insert_magnet(request.form['mlink'])
+
+@app.route("/transmission/consult")
+def transmission_consult():
+ return transmission.consult_states()
+
+@app.route("/transmission/new")
+def transmission_new():
+ return transmission.consult_magnets()
+
+@app.route("/transmission/update")
+def transmission_update():
+ return transmission.update_state(request.args.get('year'), request.args.get('month'), request.args.get('day'), request.args.get('hour'), request.args.get('minute'), request.args.get('second'), request.args.get('hash'), request.args.get('state'), request.args.get('progress'))
+
+
+if __name__ == "__main__":
+ app.run()

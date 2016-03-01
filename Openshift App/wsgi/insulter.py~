@@ -1,0 +1,38 @@
+import psycopg2
+import os
+from random import choice
+
+def insult():
+ return "Thou " + generate_insult() + "!"
+
+def named_insult(name):
+ return name + ", thou " + generate_insult() + "!"
+
+def generate_insult():
+ #local_cursor = get_cursor()
+ #final_insult = get_word(local_cursor, "short_adjective") + " " + get_word(local_cursor,"long_adjective") + " " 
+		#+ get_word(local_cursor, "noun")
+ #close_cursor(local_cursor)
+ return "lol"#final_insult
+
+ return choice(first_adjs) + " " + choice(second_adjs) + " " + choice(nouns)
+
+def get_cursor():
+ conn = psycopg2.connect(database=os.environ['OPENSHIFT_APP_NAME'],
+               user=os.environ['OPENSHIFT_POSTGRESQL_DB_USERNAME'],
+               password=os.environ['OPENSHIFT_POSTGRESQL_DB_PASSWORD'],
+               host=os.environ['OPENSHIFT_POSTGRESQL_DB_HOST'],
+               port=os.environ['OPENSHIFT_POSTGRESQL_DB_PORT'] )
+ cursor = conn.cursor()
+ return cursor
+
+def close_cursor(cursor):
+ conn = cursor.connection
+ cursor.close()
+ conn.close()
+
+def get_word(cursor, table):
+ sql = "select string from " + table + " offset random()* (select count(*) from " +  table + ") limit 1;"
+ cursor.execute(sql)
+ result = cursor.fetchone()
+ return result[0]
